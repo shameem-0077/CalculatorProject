@@ -4,68 +4,51 @@ import React, { Children, useEffect, useState } from 'react'
 const HomeScreen = () => {
 
   const [textNumbers, setTextNumbers] = useState([])
-  const [currentValue, setCurrentValue] = useState([])
-  const [prevValue, setPrevValue] = useState([])
-  const [opratorValue, setOpratorValue] = useState("")
+  const [userShowInput, setUserShowInput] = useState([])
 
-  useEffect(() => {
-    console.log(textNumbers)
-  }, [textNumbers])
 
   let addToInput = ({number, oprator}) => {
     console.log(number)
    
     if(oprator == "clear") {
       setTextNumbers([])
+      setUserShowInput([])
     } else {
       if(oprator == "back") {
+        userShowInput.splice(-1)
         textNumbers.splice(-1)
         setTextNumbers(oldNumbers => [...oldNumbers] )
+        setUserShowInput(oldNumbers => [...oldNumbers] )
       } else {
-        // setPrevValue(parseInt(currentValue))
-        // setCurrentValue(parseInt(inputnumber))
         if(number) {
-
+          setUserShowInput(oldNumbers => [...oldNumbers, number])
           setTextNumbers(oldNumbers => [...oldNumbers, number])
         } else if (oprator != "=") {
+          if(oprator == "/") {
+            setUserShowInput(oldNumbers => [...oldNumbers, `${"÷"}`])
+
+          } else if(oprator == "*") {
+            setUserShowInput(oldNumbers => [...oldNumbers, `${"×"}`])
+          } else {
+            setUserShowInput(oldNumbers => [...oldNumbers, `${oprator}`])
+
+          }
           setTextNumbers(oldNumbers => [...oldNumbers, `${oprator}`])
+        } else {
+          resultFunction()
+
         }
         
-        if(oprator == "+") {
-          if(opratorValue) {
-            resultFunction()
-          } else {
-            setOpratorValue("+")
-
-          }
-        } else if(oprator == "-") {
-          if(opratorValue) {
-            resultFunction()
-          } else {
-            setOpratorValue("-")
-
-          }
-
-        } else if (oprator == "=") {
-          resultFunction()
-        }
-
       }
     }
   }
 
   let resultFunction = () => {
     let result = textNumbers.join("")
-    result = result.split(opratorValue)
-    // console.log(result[0])
-    if(opratorValue == "+") {
-      setTextNumbers([parseInt(result[0]) + parseInt(result[1])])
-
-    } else if(opratorValue == "-") {
-      setTextNumbers([parseInt(result[0]) - parseInt(result[1])])
-    }
-
-    setOpratorValue("")
+    result = eval(result)
+    setTextNumbers([result])
+    setUserShowInput([result])
+    
   }
 
 
@@ -73,17 +56,17 @@ const HomeScreen = () => {
   return (
     <View style={{flex: 1}}>
         <View style={{flex: 1, backgroundColor: "#9DB2BF", borderBottomLeftRadius: 20, borderBottomRightRadius: 20, justifyContent: 'center'}}>
-            <TextInput value={textNumbers.join("")} onChangeText={setTextNumbers} showSoftInputOnFocus={false} keyboardType="numeric" style={{textAlign: 'right', fontSize: 60}} />
+            <TextInput value={userShowInput.join("")} onChangeText={setUserShowInput} showSoftInputOnFocus={false} keyboardType="numeric" style={{textAlign: 'right', fontSize: 60}} />
         </View>
         <View style={{flex: 3, justifyContent: 'center', backgroundColor: "#DDE6ED"}}>
             <View style={styles.rowStyles}>
                 <TouchableOpacity onPress={() => addToInput({oprator: "clear"})} style={styles.meterialButtonStyle}>
                     <Text style={styles.meterialTextStyle}>AC</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => addToInput({oprator:"( )"})} style={styles.meterialButtonStyle}>
+                <TouchableOpacity disabled={true} onPress={() => addToInput({oprator:"( )"})} style={styles.meterialButtonStyle}>
                     <Text style={styles.meterialTextStyle}>{'( )'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => addToInput("%")} style={styles.meterialButtonStyle}>
+                <TouchableOpacity disabled={true} onPress={() => addToInput("%")} style={styles.meterialButtonStyle}>
                   <Image style={styles.iconsStyles} source={require("../../assets/icons/percent.png")} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => addToInput({oprator:"/"})} style={styles.meterialButtonStyle}>
@@ -137,7 +120,7 @@ const HomeScreen = () => {
                 <TouchableOpacity onPress={() => addToInput({number: "0"})} style={styles.meterialButtonStyle}>
                     <Text style={styles.meterialTextStyle}>0</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => addToInput({oprator:"."})} style={styles.meterialButtonStyle}>
+                <TouchableOpacity disabled={true} onPress={() => addToInput({oprator:"."})} style={styles.meterialButtonStyle}>
                     <Text style={styles.meterialTextStyle}>.</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => addToInput({oprator:"back"})} style={styles.meterialButtonStyle}>
